@@ -914,6 +914,10 @@ fi
 crontab /tmp/crontab.tmp 2>/dev/null
 rm /tmp/crontab.tmp
 echo "Argosbx脚本进程启动成功，安装完毕" && sleep 2
+# === 增加定时检测任务，每2分钟检查一次进程并自动重启 ===
+(crontab -l 2>/dev/null; echo "*/2 * * * * pgrep -f 'agsbx/sing-box' >/dev/null 2>&1 || nohup $HOME/agsbx/sing-box run -c $HOME/agsbx/sb.json >/dev/null 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "*/2 * * * * pgrep -f 'agsbx/xray' >/dev/null 2>&1 || nohup $HOME/agsbx/xray run -c $HOME/agsbx/xr.json >/dev/null 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "*/2 * * * * pgrep -f 'agsbx/cloudflared' >/dev/null 2>&1 || nohup $HOME/agsbx/cloudflared tunnel --url http://localhost:$(cat $HOME/agsbx/port_vm_ws) --edge-ip-version auto --no-autoupdate --protocol http2 > $HOME/agsbx/argo.log 2>&1") | crontab -
 else
 echo "Argosbx脚本进程未启动，安装失败" && exit
 fi
